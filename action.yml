@@ -31,16 +31,19 @@ runs:
         distribution: "temurin" # See 'Supported distributions' for available options
         java-version: ${{ inputs.java_version }}
     - name: Get validator
+      shell: bash
       run: |
         curl -sSL https://github.com/MobilityData/gtfs-validator/releases/download/v$MD_VALIDATOR_VERSION/gtfs-validator-$MD_VALIDATOR_VERSION-cli.jar -o gtfs-validator.jar
       env:
         MD_VALIDATOR_VERSION: ${{ inputs.md_validator_version }}
     - name: Run validator
+      shell: bash
       run: |
         java -jar gtfs-validator.jar -i $GTFS_PATH -o $VALIDATION_RESULTS_PATH 
       env:
         GTFS_PATH: ${{ inputs.gtfs_path }}
         VALIDATION_RESULTS_PATH: ${{ inputs.validation_results_path }}
-      - name: Check validation results
-        run: |
-          node check-validation-results.js $VALIDATION_RESULTS_PATH/report.json
+    - name: Check validation results
+      shell: bash
+      run: |
+        node check-validation-results.js $VALIDATION_RESULTS_PATH/report.json
