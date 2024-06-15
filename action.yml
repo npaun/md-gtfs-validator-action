@@ -1,0 +1,46 @@
+name: 'Validate GTFS feed with MD Validator'
+description: 'Validate a GTFS feed using the canonical GTFS validator provided by MobilityData'
+inputs:
+  gtfs_path:
+    required: true
+    description: 'Path to the GTFS feed to validate'
+  md_validator_version:
+    required: false
+    description: 'Version of the MobilityData validator to install'
+    default: '5.0.1'
+  validation_results_path:
+    required: false
+    description: 'Path to write the GTFS validation report'
+    default: 'validation-results'
+  java_version:
+    required: false
+    description: 'Version of Java to install'
+    default: '17'
+  node_version:
+    required: false
+    description: 'Version of NodeJS to install'
+    default: '20'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: ${{ inputs.java_version }}
+      - name: Get validator
+        run: |
+          curl -sSL https://github.com/MobilityData/gtfs-validator/releases/download/v$MD_VALIDATOR_VERSION/gtfs-validator-$MD_VALIDATOR_VERSION-cli.jar -o gtfs-validator.jar
+        env:
+          MD_VALIDATOR_VERSION: ${{ inputs.md_validator_version }}
+      - name: Run validator
+        run: |
+          java -jar gtfs-validator.jar -i $GTFS_PATH -o $VALIDATION_RESULTS_PATH 
+        env:
+          GTFS_PATH: ${{ inputs.gtfs_path }}
+          VALIDATION_RESULTS_PATH: ${{ inputs.validation_results_path }}
+      - name: Check validation results
+        run: |
+          node check-validation-results.js $VALIDATION_RESULTS_PATH/report.json
