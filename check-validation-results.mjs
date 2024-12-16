@@ -12,11 +12,12 @@ for (const notice of report.notices) {
   }
 
   summaryStream.write(`
-## ${notice.severity}: ${notice.code} (${notice.totalNotices})
-
+<details>
+<summary>${notice.severity}: ${notice.code} (${notice.totalNotices})</summary>
 \`\`\`json
 ${JSON.stringify(notice.sampleNotices, null, 2)}
 \`\`\`
+</details>
 `);
 }
 
