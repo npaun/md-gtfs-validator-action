@@ -1,6 +1,7 @@
-const fs = require('fs');
+import fs from 'fs';
 
 const reportPath = process.argv[2];
+const summaryStream = fs.createWriteStream(process.argv[3]);
 const report = JSON.parse(fs.readFileSync(reportPath));
 
 for (const notice of report.notices) {
@@ -9,5 +10,14 @@ for (const notice of report.notices) {
   if (notice.severity === 'ERROR') {
     process.exitCode = 1; // Sets process status to 1 (unsuccessful) which triggers a failure in Github Actions
   }
+
+  summaryStream.write(`
+## ${notice.severity}: ${notice.code} (${notice.totalNotices})
+
+\`\`\`json
+${JSON.stringify(notice.sampleNotices, null, 2)}
+\`\`\`
+`);
 }
 
+await summaryStream.end();

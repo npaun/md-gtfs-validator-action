@@ -51,7 +51,7 @@ runs:
     - name: Check validation results
       shell: bash
       run: |
-        node $GITHUB_ACTION_PATH/check-validation-results.js $VALIDATION_RESULTS_PATH/report.json
+        node $GITHUB_ACTION_PATH/check-validation-results.mjs $VALIDATION_RESULTS_PATH/report.json $GITHUB_STEP_SUMMARY
       env:
         VALIDATION_RESULTS_PATH: ${{ inputs.validation_results_path }}
         GITHUB_ACTION_PATH: ${{ github.action_path }}
